@@ -1,10 +1,10 @@
 "use client";
-import { BACKEND_URL, FRONTEND_APi } from "@/config/config";
+import { BACKEND_URL, FRONTEND_API } from "@/config/config";
 import { setUser } from "@/store/slices/userSlice";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -22,7 +22,7 @@ export default function SignInPage() {
   if (user.isAuthenticated) {
     router.push("/");
   }
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -50,11 +50,16 @@ export default function SignInPage() {
         },
         {
           headers: {
-            "api-key": FRONTEND_APi,
+            "api-key": FRONTEND_API,
           },
         }
       );
-
+      if (resp.data.data.user.role !== "admin") {
+        toast.error(
+          "Students are not authorized in admin panel You need admin account"
+        );
+        return;
+      }
       localStorage.setItem("refreshToken", resp.data.data.refreshToken);
       dispatch(
         setUser({
@@ -64,15 +69,16 @@ export default function SignInPage() {
       );
       toast.success("Sign in successful!");
       router.push("/");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      toast.error(error.response.data.error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white shadow-lg rounded-lg p-8">
+        <div className="bg-white shadow-xl rounded-lg p-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Sign In</h2>
           </div>

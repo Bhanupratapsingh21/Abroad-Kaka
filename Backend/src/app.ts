@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes";
 import countryRoutes from "./routes/country.routes";
+import universityRoutes from "./routes/university.routes";
 import { authenticate } from "./middleware/auth.middleware";
 import errorHandler from "./middleware/errorHandler.middleware";
 import { connectDB } from "./config/db";
@@ -14,19 +15,25 @@ export async function createApp() {
   const app = express();
 
   // ✅ CORS: Allow all origins and headers including custom ones like api-key
-  app.use(cors({
-    origin: "*", // Allow all origins
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "api-key"], // Add your custom headers here
-    exposedHeaders: ["Authorization"]
-  }));
+  app.use(
+    cors({
+      origin: "*", // Allow all origins
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      allowedHeaders: ["Content-Type", "authorization", "api-key"], // Add your custom headers here
+      exposedHeaders: ["Authorization"],
+    })
+  );
 
   app.use(morgan("dev"));
   app.use(express.json());
+  app.use(apiCheck());
 
   // Public routes
-  app.use("/api/auth", apiCheck(), authRoutes);
-  app.use("/api/country", apiCheck(), countryRoutes)
+
+  app.use("/api/auth", authRoutes);
+  app.use("/api/country", countryRoutes);
+  app.use("/api/universities", universityRoutes);
+
   // Protected test route
   app.get(
     "/api/protected",

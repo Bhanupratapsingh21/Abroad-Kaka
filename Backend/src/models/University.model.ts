@@ -31,7 +31,9 @@ export interface IUniversity extends Document {
   location: string;
   tagline: string;
   coverImage: string;
+  coverImagePublicId?: string; // For Cloudinary management
   logo: string;
+  logoPublicId?: string; // For Cloudinary management
   established: number;
   highlights: Highlight[];
   about: string;
@@ -53,62 +55,74 @@ export interface IUniversity extends Document {
   comparison: mongoose.Schema.Types.Mixed[];
 }
 
-const UniversitySchema = new Schema<IUniversity>({
-  name: { type: String, required: true },
-  university: { type: String, required: true },
-  country: { type: Schema.Types.ObjectId, ref: "Country", required: true },
-  location: String,
-  tagline: String,
-  coverImage: String,
-  logo: String,
-  established: Number,
+const UniversitySchema = new Schema<IUniversity>(
+  {
+    name: { type: String, required: true },
+    university: { type: String, required: true },
+    country: { type: Schema.Types.ObjectId, ref: "Country", required: true },
+    location: String,
+    tagline: String,
+    coverImage: String,
+    coverImagePublicId: String, // For Cloudinary image management
+    logo: String,
+    logoPublicId: String, // For Cloudinary image management
+    established: String,
 
-  highlights: [
-    {
-      label: String,
-      value: String,
-      icon: String,
-    },
-  ],
+    highlights: [
+      {
+        label: String,
+        value: String,
+        icon: String,
+      },
+    ],
 
-  about: String,
-  programs: [String],
-  duration: String,
-  medium: String,
-  gpaRequired: String,
-  feesUSD: String,
-  feesINR: String,
-  feeStructure: [
-    {
-      year: Number,
-      tuition: Number,
-      hostel: Number,
-    },
-  ],
-  hostelCost: String,
-  approvedBy: [String],
-  facilities: [String],
-  eligibility: [String],
-  admissionSteps: [String],
-  documents: [String],
+    about: String,
+    programs: [String],
+    duration: String,
+    medium: String,
+    gpaRequired: String,
+    feesUSD: String,
+    feesINR: String,
+    feeStructure: [
+      {
+        year: Number,
+        tuition: Number,
+        hostel: Number,
+      },
+    ],
+    hostelCost: String,
+    approvedBy: [String],
+    facilities: [String],
+    eligibility: [String],
+    admissionSteps: [String],
+    documents: [String],
 
-  reviews: [
-    {
-      name: String,
-      image: String,
-      rating: Number,
-      review: String,
-    },
-  ],
+    reviews: [
+      {
+        name: String,
+        image: String,
+        rating: Number,
+        review: String,
+      },
+    ],
 
-  faqs: [
-    {
-      q: String,
-      a: String,
-    },
-  ],
+    faqs: [
+      {
+        q: String,
+        a: String,
+      },
+    ],
 
-  comparison: [Schema.Types.Mixed],
-});
+    comparison: [Schema.Types.Mixed],
+  },
+  {
+    timestamps: true, // Adds createdAt and updatedAt fields
+  }
+);
+
+// Index for better search performance
+UniversitySchema.index({ name: "text", university: "text", location: "text" });
+UniversitySchema.index({ country: 1 });
+UniversitySchema.index({ programs: 1 });
 
 export default mongoose.model<IUniversity>("University", UniversitySchema);
